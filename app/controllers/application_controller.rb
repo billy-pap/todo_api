@@ -9,7 +9,7 @@ class ApplicationController < ActionController::API
     @current_user = User.find_by(auth_token: token)
 
     unless @current_user
-      render json: { error: "Unauthorized" }, status: :unauthorized
+      render json: { error: "Unauthorized!" }, status: :unauthorized
       return
     end
   end
