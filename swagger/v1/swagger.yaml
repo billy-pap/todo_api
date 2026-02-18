@@ -1,0 +1,281 @@
+---
+openapi: 3.0.1
+info:
+  title: Todo API
+  version: v1
+components:
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: 'Use: Token YOUR_TOKEN'
+paths:
+  "/signup":
+    post:
+      summary: Signup
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: validation error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: user@example.com
+                    password:
+                      type: string
+                      example: password123
+                    password_confirmation:
+                      type: string
+                      example: password123
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+              required:
+              - user
+  "/auth/login":
+    post:
+      summary: Login
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+              - email
+              - password
+  "/auth/logout":
+    get:
+      summary: Logout
+      tags:
+      - Auth
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        description: Token auth header, e.g. "Token abc123"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: unauthorized
+  "/todos/{todo_id}/items":
+    parameters:
+    - name: todo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Create a new todo item
+      tags:
+      - Items
+      security:
+      - TokenAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                      example: Buy milk
+                    done:
+                      type: boolean
+                      example: false
+                  required:
+                  - content
+              required:
+              - item
+  "/todos/{todo_id}/items/{id}":
+    parameters:
+    - name: todo_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a todo item
+      tags:
+      - Items
+      security:
+      - TokenAuth: []
+      responses:
+        '200':
+          description: ok
+    put:
+      summary: Update a todo item
+      tags:
+      - Items
+      security:
+      - TokenAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: ok
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                      example: Buy milk
+                    done:
+                      type: boolean
+                      example: true
+              required:
+              - item
+    delete:
+      summary: Delete a todo item
+      tags:
+      - Items
+      security:
+      - TokenAuth: []
+      responses:
+        '204':
+          description: no content
+  "/todos":
+    get:
+      summary: List all todos (with items)
+      tags:
+      - Todos
+      security:
+      - TokenAuth: []
+      responses:
+        '200':
+          description: ok
+        '401':
+          description: unauthorized
+    post:
+      summary: Create a new todo
+      tags:
+      - Todos
+      security:
+      - TokenAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                todo:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: My todo
+                    description:
+                      type: string
+                      example: desc
+                  required:
+                  - title
+              required:
+              - todo
+  "/todos/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get a todo
+      tags:
+      - Todos
+      security:
+      - TokenAuth: []
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: not found
+    put:
+      summary: Update a todo
+      tags:
+      - Todos
+      security:
+      - TokenAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: ok
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                todo:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: Updated
+                    description:
+                      type: string
+                      example: desc
+              required:
+              - todo
+    delete:
+      summary: Delete a todo and its items
+      tags:
+      - Todos
+      security:
+      - TokenAuth: []
+      responses:
+        '204':
+          description: no content
